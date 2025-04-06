@@ -10,9 +10,8 @@ export default function LogoutButton() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.refresh(); // Wichtig: Server Components neu laden lassen
-    // Optional: Nach Logout zur Login-Seite weiterleiten
-    // router.push('/login');
+    // router.refresh(); // Entfernt oder auskommentiert
+    router.push('/login'); // Zur Login-Seite weiterleiten
   };
 
   return (

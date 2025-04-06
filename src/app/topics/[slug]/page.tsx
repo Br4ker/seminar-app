@@ -8,7 +8,7 @@ import CourseList from '@/components/CourseList';
 import Link from 'next/link';
 
 // Typen (bleiben wichtig für die Struktur)
-type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
+export type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
 export type Topic = {
   id: string;
   created_at: string;
@@ -28,29 +28,29 @@ export type Course = {
   is_active: boolean;
 };
 
-type PageProps = {
+interface PageProps {
   params: {
     slug: string;
   };
-};
+}
 
 export default async function TopicPage({ params }: PageProps) {
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
-  const { slug } = params;
+  const topicSlug = params.slug;
 
   // 1. Details des spezifischen Themas anhand des Slugs abrufen
   //    Entferne .returns<Topic>() - lass TS den Typ aus der Abfrage ableiten
   const { data: topic, error: topicError } = await supabase
     .from('topics')
     .select('*')
-    .eq('slug', slug)
+    .eq('slug', topicSlug)
     .single(); // single() liefert das Objekt oder null
 
   // Wenn Thema nicht gefunden oder Fehler -> 404-Seite anzeigen
   // Diese Prüfung sollte TypeScript helfen zu verstehen, dass 'topic' danach nicht null ist.
   if (topicError || !topic) {
-    console.error(`Fehler beim Abrufen des Themas mit Slug "${slug}":`, topicError);
+    console.error(`Fehler beim Abrufen des Themas mit Slug "${topicSlug}":`, topicError);
     notFound();
   }
 
