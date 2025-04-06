@@ -25,7 +25,7 @@ export async function createClient(cookieStoreParam: ReturnType<typeof cookies>)
             cookieStore.set({ name, value, ...options });
           } catch (_error) {
             // ESLint-Warnung für ungenutzte Variable explizit deaktivieren:
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+             
             // Der Fehler wird hier absichtlich ignoriert, da die Middleware
             // das Cookie-Handling übernehmen sollte.
           }
@@ -38,7 +38,7 @@ export async function createClient(cookieStoreParam: ReturnType<typeof cookies>)
             cookieStore.set({ name, value: '', ...options });
           } catch (_error) {
              // ESLint-Warnung für ungenutzte Variable explizit deaktivieren:
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+             
             // Der Fehler wird hier absichtlich ignoriert.
           }
         },

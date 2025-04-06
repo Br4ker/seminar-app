@@ -30,14 +30,14 @@ export type Course = {
 
 interface PageProps {
   params: {
-    slug: string;
+    slug?: string;
   };
 }
 
 export default async function TopicPage({ params }: PageProps) {
   const cookieStore = cookies();
   const supabase = await createClient(cookieStore);
-  const topicSlug = params.slug;
+  const topicSlug = params?.slug;
 
   // 1. Details des spezifischen Themas anhand des Slugs abrufen
   //    Entferne .returns<Topic>() - lass TS den Typ aus der Abfrage ableiten
