@@ -1,4 +1,5 @@
 // src/components/Header.tsx
+import React from 'react';
 import Link from 'next/link';
 //import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server'; // Server Client wird hier benötigt
@@ -42,10 +43,12 @@ export default async function Header() {
       <nav className="container mx-auto flex items-center justify-between p-4 h-16"> {/* Feste Höhe für Header */}
 
         {/* Logo oder App-Name (Link zur Startseite) */}
+        
         <Link href="/" className="text-lg font-semibold hover:text-indigo-300 transition-colors">
-          Seminar Portal
+        Ingersoll Haiger - Seminar Portal <p className="text-sm text-neutral-400 max-w-2xl"> Created S.Tilmes</p>
         </Link>
-
+        
+        
         {/* Navigationslinks & Buttons */}
         <div className="flex items-center gap-x-4 md:gap-x-6"> {/* Abstand zwischen Elementen */}
 
