@@ -3,9 +3,22 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Erweiterte Farbpalette */
+  --primary: #2563eb; /* blue-600 */
+  --primary-hover: #1d4ed8; /* blue-700 */
+  --secondary: #e5e7eb; /* gray-200 */
+  --accent: #db2777; /* pink-600 */
+  --accent-hover: #be185d; /* pink-700 */
+
+  /* Textfarben */
+  --text-primary: var(--foreground);
+  --text-secondary: #6b7280; /* gray-500 */
+  --text-on-primary: #ffffff; /* Text auf primärem Hintergrund */
+  --text-on-accent: #ffffff; /* Text auf Akzenthintergrund */
 }
 
-@theme inline {
+@theme inline { /* Oder wie immer dein Theme-Setup funktioniert */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -16,11 +29,59 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    /* Farben für Dark Mode anpassen */
+    --primary: #3b82f6; /* blue-500 */
+    --primary-hover: #2563eb; /* blue-600 */
+    --secondary: #1f2937; /* gray-800 */
+    --accent: #30d358; /* pink-500 */
+    --accent-hover: #db2777; /* pink-600 */
+
+    --text-primary: var(--foreground);
+    --text-secondary: #9ca3af; /* gray-400 */
+    --text-on-primary: #ffffff;
+    --text-on-accent: #ffffff;
   }
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary); /* Nutze die neue Textvariable */
+  /* font-family: Arial, Helvetica, sans-serif; */ /* Entfernen, wenn --font-sans korrekt geladen wird */
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif; /* Sicherstellen, dass die Variable angewendet wird */
+  /* Optional: Sanftere Übergänge für Farbwechsel */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Globale Stile für Elemente (sparsam verwenden!) */
+@layer base { /* Tailwind's base layer nutzen */
+
+  a {
+    color: var(--accent);
+    text-decoration: none; /* Oder underline */
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+
+  /* Basis-Styling für Buttons (kann durch Tailwind-Klassen überschrieben werden) */
+  /* Besser ist es oft, Buttons komplett als Komponenten zu stylen */
+  /*
+  button, input[type="button"], input[type="submit"] {
+    background-color: var(--accent);
+    color: var(--text-on-accent);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem; // Entspricht Tailwind's rounded-md
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+    background-color: var(--accent-hover);
+  }
+  */
 }
