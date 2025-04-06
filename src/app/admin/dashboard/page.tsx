@@ -1,5 +1,5 @@
 // src/app/admin/dashboard/page.tsx
-import { cookies } from 'next/headers';
+//import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { format, parseISO } from 'date-fns'; // Für Datumsformatierung
@@ -36,8 +36,8 @@ type CombinedRequest = TrainingRequest & {
 
 
 export default async function AdminDashboardPage() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
+  //const cookieStore = cookies();
+  const supabase = createClient();
 
   // 1. Authentifizierung prüfen
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();

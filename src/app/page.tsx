@@ -1,5 +1,5 @@
 // src/app/page.tsx
-import { cookies } from 'next/headers';
+//import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 // LogoutButton wird hier nicht mehr importiert, da er nur im Header ist
 // import LogoutButton from '@/components/LogoutButton';
@@ -17,8 +17,8 @@ type Topic = {
 };
 
 export default async function HomePage() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
+  //const cookieStore = cookies();
+  const supabase = createClient();
 
   // Session holen (um zu entscheiden, ob Themen oder Login-Aufforderung gezeigt wird)
   const { data: { session } } = await supabase.auth.getSession();

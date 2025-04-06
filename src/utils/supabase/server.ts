@@ -1,45 +1,47 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// src/utils/supabase/server.ts - Angepasste Version für vermeintliches Promise
+// src/utils/supabase/server.ts - Workaround mit async Handlern
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-// Machen wir die Funktion async, um auf das vermeintliche Promise zu warten
-export async function createClient(cookieStoreParam: ReturnType<typeof cookies>) {
-  // Warten auf das Ergebnis, da TypeScript hier ein Promise erwartet
-  const cookieStore = await cookieStoreParam;
+// createClient selbst bleibt synchron
+export function createClient() {
+  // cookies() hier aufrufen. TypeScript denkt vielleicht, dies ist ein Promise.
+  const cookieStoreInstance = cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          // Verwende das (jetzt aufgelöste) cookieStore Objekt
-          return cookieStore.get(name)?.value;
+        // Handler wird async
+        async get(name: string) {
+          // Wir warten hier auf das vermeintliche Promise
+          const store = await cookieStoreInstance;
+          // Dann greifen wir synchron auf .get zu
+          return store.get(name)?.value;
         },
-        set(name: string, value: string, options: CookieOptions) {
+        // Handler wird async
+        async set(name: string, value: string, options: CookieOptions) {
           try {
-            // Verwende das (jetzt aufgelöste) cookieStore Objekt
-            // Hinweis: Dies wird in Server Components immer noch fehlschlagen,
-            // aber der try/catch fängt es ab.
-            cookieStore.set({ name, value, ...options });
+            // Wir warten hier auf das vermeintliche Promise
+            const store = await cookieStoreInstance;
+            // Dann greifen wir synchron auf .set zu
+            store.set({ name, value, ...options });
           } catch (_error) {
-            // ESLint-Warnung für ungenutzte Variable explizit deaktivieren:
              
-            // Der Fehler wird hier absichtlich ignoriert, da die Middleware
-            // das Cookie-Handling übernehmen sollte.
+            // Fehler beim Setzen im Server Component ignorieren
           }
         },
-        remove(name: string, options: CookieOptions) {
+        // Handler wird async
+        async remove(name: string, options: CookieOptions) {
           try {
-            // Verwende das (jetzt aufgelöste) cookieStore Objekt
-            // Hinweis: Dies wird in Server Components immer noch fehlschlagen,
-            // aber der try/catch fängt es ab.
-            cookieStore.set({ name, value: '', ...options });
+            // Wir warten hier auf das vermeintliche Promise
+            const store = await cookieStoreInstance;
+             // Dann greifen wir synchron auf .set zu (für remove)
+            store.set({ name, value: '', ...options });
           } catch (_error) {
-             // ESLint-Warnung für ungenutzte Variable explizit deaktivieren:
              
-            // Der Fehler wird hier absichtlich ignoriert.
+            // Fehler beim Entfernen im Server Component ignorieren
           }
         },
       },

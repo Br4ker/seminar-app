@@ -1,13 +1,13 @@
 // src/components/Header.tsx
 import Link from 'next/link';
-import { cookies } from 'next/headers';
+//import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server'; // Server Client wird hier benötigt
 import LogoutButton from './LogoutButton'; // LogoutButton importieren
 
 // Dies ist eine Server Component, da sie Daten (Session, Rolle) serverseitig abruft
 export default async function Header() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
+  //const cookieStore = cookies();
+  const supabase = createClient();
 
   // Aktuelle Benutzersession holen
   const { data: { session } } = await supabase.auth.getSession();

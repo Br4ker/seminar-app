@@ -1,5 +1,5 @@
 // src/app/my-requests/page.tsx
-import { cookies } from 'next/headers';
+//import { cookies } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { format, parseISO } from 'date-fns'; // Für Datumsformatierung
@@ -18,9 +18,8 @@ type UserTrainingRequest = {
 };
 
 export default async function MyRequestsPage() {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
-
+  //const cookieStore = cookies();
+  const supabase = createClient();
   // 1. Prüfen, ob der Benutzer überhaupt eingeloggt ist
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 

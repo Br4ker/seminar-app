@@ -1,8 +1,8 @@
-// src/app/admin/actions.ts
+// src/app/admin/actions.ts - KORRIGIERTE VERSION
 'use server';
 
 import { createClient } from '@/utils/supabase/server';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers'; // Nicht mehr direkt hier benötigt
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { User } from '@supabase/supabase-js'; // User-Typ importieren
@@ -12,8 +12,9 @@ import type { User } from '@supabase/supabase-js'; // User-Typ importieren
 // Gibt bei Erfolg das User-Objekt zurück, sonst leitet sie um oder wirft Fehler.
 // ==============================================================
 async function ensureAdmin(): Promise<User> {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
+  // const cookieStore = cookies(); // Entfernt
+  // createClient OHNE await und OHNE Argument aufrufen
+  const supabase = createClient();
 
   // 1. Authentifizierung prüfen
   const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -68,7 +69,8 @@ type NewStatus = 'approved' | 'rejected' | 'pending' | 'completed';
 // --- Server Action: updateRequestStatus (jetzt mit ensureAdmin) ---
 export async function updateRequestStatus(formData: FormData) {
   console.log('[Server Action] updateRequestStatus gestartet.');
-  const supabase = await createClient(cookies());
+  // createClient OHNE await und OHNE Argument aufrufen
+  const supabase = createClient();
 
   try {
     // 1. Sicherstellen, dass der User Admin ist (wirft Fehler/redirect wenn nicht)
@@ -99,15 +101,14 @@ export async function updateRequestStatus(formData: FormData) {
   } catch (error) {
     console.error('Fehler in updateRequestStatus:', error);
     // Fehler wird geloggt. Funktion gibt implizit void zurück.
-    // Hier könnte man ggf. eine spezifische Fehlermeldung für die UI zurückgeben,
-    // wenn man später z.B. useFormState verwendet.
   }
 }
 
 // --- Server Action: saveAdminNote (jetzt mit ensureAdmin) ---
 export async function saveAdminNote(formData: FormData) {
    console.log('[Server Action] saveAdminNote gestartet.');
-   const supabase = await createClient(cookies());
+   // createClient OHNE await und OHNE Argument aufrufen
+   const supabase = createClient();
 
    try {
      // 1. Sicherstellen, dass der User Admin ist
@@ -139,3 +140,7 @@ export async function saveAdminNote(formData: FormData) {
         console.error('Fehler in saveAdminNote:', error);
    }
 }
+
+// HINWEIS: Die Funktion 'handleCourseInquiry' war in diesem Code nicht enthalten,
+// falls du sie auch verwendest, musst du den createClient-Aufruf dort ebenfalls
+// wie oben gezeigt anpassen (ohne await, ohne Argument).

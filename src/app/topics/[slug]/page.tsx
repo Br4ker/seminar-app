@@ -1,13 +1,10 @@
 // src/app/topics/[slug]/page.tsx
-import { cookies } from 'next/headers';
-import { createClient } from '@/utils/supabase/server';
-import { notFound } from 'next/navigation'; // notFound wird verwendet
-// import { redirect } from 'next/navigation'; // Entfernt, da nicht verwendet
+import { createClient } from '@/utils/supabase/server'; // Import bleibt
+import { notFound } from 'next/navigation';
 import CourseList from '@/components/CourseList';
-// import type { PostgrestError } from '@supabase/supabase-js'; // Entfernt, da Typinferenz genutzt wird
 import Link from 'next/link';
 
-// Typen (bleiben wichtig für die Struktur)
+// Typen (bleiben unverändert)
 export type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
 export type Topic = {
   id: string;
@@ -28,54 +25,50 @@ export type Course = {
   is_active: boolean;
 };
 
-interface PageProps {
-  params: {
-    slug?: string;
-  };
+// Props-Typ an Next.js 15 anpassen: params ist ein Promise!
+interface TopicPageProps {
+  params: Promise<{ slug: string }>;
+  // searchParams?: Promise<{ [key: string]: string | string[] | undefined }>; // Falls du searchParams brauchst
 }
 
-export default async function TopicPage({ params }: PageProps) {
-  const cookieStore = cookies();
-  const supabase = await createClient(cookieStore);
-  const topicSlug = params?.slug;
+// Props-Typ hier verwenden
+export default async function TopicPage({ params }: TopicPageProps) {
+  // Zuerst das params-Promise auflösen
+  const resolvedParams = await params;
+  // Dann auf den slug im aufgelösten Objekt zugreifen
+  const topicSlug = resolvedParams.slug;
+
+  // createClient bleibt synchron (wie im Workaround von server.ts)
+  const supabase = createClient();
 
   // 1. Details des spezifischen Themas anhand des Slugs abrufen
-  //    Entferne .returns<Topic>() - lass TS den Typ aus der Abfrage ableiten
+  // Hier den aufgelösten topicSlug verwenden
   const { data: topic, error: topicError } = await supabase
     .from('topics')
     .select('*')
     .eq('slug', topicSlug)
-    .single(); // single() liefert das Objekt oder null
+    .single();
 
-  // Wenn Thema nicht gefunden oder Fehler -> 404-Seite anzeigen
-  // Diese Prüfung sollte TypeScript helfen zu verstehen, dass 'topic' danach nicht null ist.
   if (topicError || !topic) {
     console.error(`Fehler beim Abrufen des Themas mit Slug "${topicSlug}":`, topicError);
     notFound();
   }
 
-  // Ab hier wissen wir (und TS sollte es auch wissen), dass 'topic' vom Typ Topic (oder ähnlich) ist und nicht null.
-
-  // 2. Alle aktiven Kurse für dieses Thema abrufen
-  //    Entferne .returns<Course[]>()
+  // 2. Alle aktiven Kurse für dieses Thema abrufen (Rest bleibt gleich)
   const { data: coursesData, error: coursesError } = await supabase
     .from('courses')
     .select('*')
-    .eq('topic_id', topic.id) // topic.id sollte jetzt verfügbar sein
+    .eq('topic_id', topic.id)
     .eq('is_active', true)
     .order('title', { ascending: true });
 
-  // Fehlermeldung vorbereiten
   let courseLoadErrorMessage: string | null = null;
   if (coursesError) {
     console.error(`Fehler beim Abrufen der Kurse für Topic ID ${topic.id}:`, coursesError);
-     // topic.name sollte jetzt verfügbar sein
     courseLoadErrorMessage = `Beim Laden der Kurse für "${topic.name}" ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.`;
   }
 
-  // Die 'coursesData' können wir jetzt sicher als Course[] behandeln (oder null/leer)
-  const courses = (coursesData as Course[]) ?? []; // Cast oder Standardwert
-
+  const courses = (coursesData as Course[]) ?? [];
   const availableLevels: CourseLevel[] = ['beginner', 'intermediate', 'advanced'];
 
   return (
@@ -93,7 +86,7 @@ export default async function TopicPage({ params }: PageProps) {
         </Link>
       </div>
 
-      {/* Anzeige der Themen-Details - topic.* sollte jetzt funktionieren */}
+      {/* Anzeige der Themen-Details */}
       <div className="mb-10 border-b border-neutral-800 pb-6">
         <h1 className="text-4xl font-bold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400">{topic.name}</h1>
         <p className="text-lg text-neutral-400 max-w-3xl">{topic.description ?? 'Keine Beschreibung verfügbar.'}</p>
@@ -101,7 +94,7 @@ export default async function TopicPage({ params }: PageProps) {
 
       {/* Rendern der Client Component */}
       <CourseList
-        courses={courses} // Übergeben der (hoffentlich) korrekt typisierten Kurse
+        courses={courses}
         levels={availableLevels}
         errorMessage={courseLoadErrorMessage}
       />
